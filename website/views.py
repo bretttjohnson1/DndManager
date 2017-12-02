@@ -9,7 +9,7 @@ import random
 import uuid
 import time
 from website.models import *
-from website.models import Character # do not delete
+from website.forms import *
 
 
 # Create your views here.
@@ -59,6 +59,7 @@ def respond_login(request):
 
             # gets the first and only value
             results = list(User.objects.raw("SELECT * from users where account_name = %s", [username]))
+
             if len(results) == 0:
                 return fail_login(request)
 
@@ -71,7 +72,7 @@ def respond_login(request):
             if passhash == result.password_hash:
                 return login_user(username)
 
-            return fail_login()
+            return fail_login(request)
             # return HttpResponseRedirect("/home/")
 
     return HttpResponse("Failed: This link is for post requests")
@@ -115,6 +116,9 @@ def respond_register(request):
 
 
 def homepage(request, session_id):
+    if request.method == "POST":
+        return HttpResponse("Error: This link is for get requests")
+
     def fail_session():
         template = loader.get_template('login.html')
         context = {"loginform": LoginForm(),
@@ -173,4 +177,49 @@ def create_character(request, session_id):
 
 
 def edit_character(request, session_id, character_id):
-    pass
+    if request.method == "POST":
+        return HttpResponse("Error: This link is for get requests")
+
+    def fail_session():
+        template = loader.get_template('login.html')
+        context = {"loginform": LoginForm(),
+                   "registerform": RegisterForm(),
+                   "login_err_mesg": "Error: invalid session id"}
+
+        return HttpResponse(template.render(context, request))
+
+
+
+    if session_id not in sessions:
+        return fail_session()
+
+    username = sessions[session_id]
+
+    characters = list(Character.objects.raw("SELECT * FROM characters WHERE char_id = %s", [str(character_id)]))
+    if len(characters) > 1:
+        return fail_session()
+
+    if len(characters) == 0:
+        return HttpResponse("NO character of id " + str(character_id))
+
+    character = characters[0]
+
+    stats_list = list(Base_Stats.objects.raw("SELECT * FROM base_stats WHERE char_id_id = %s",[str(character_id),]))
+
+    if len(stats_list) > 1:
+        return fail_session()
+
+    if len(stats_list) == 0:
+        return HttpResponse("NO stats of id " + str(character_id))
+
+    stats = stats_list[0]
+    character_form = CharacterModelForm(instance=character)
+    character_form_data = FormData("Character Info","update_character_info")
+    stats_form =  BaseStatsModelForm(instance=stats)
+    stats_form_data = FormData("Character Stats","update_stats")
+
+    template = loader.get_template('edit_character.html')
+    context = {"forms": zip([character_form, stats_form], [character_form_data,stats_form_data]),
+               "username": username}
+
+    return HttpResponse(template.render(context, request))
