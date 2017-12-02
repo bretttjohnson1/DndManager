@@ -146,7 +146,7 @@ def create_character(request, session_id):
         template = loader.get_template('login.html')
         context = {"loginform": LoginForm(),
                    "registerform": RegisterForm(),
-                   "login_err_mesg": "Incorrection session_id, it does not exist in the dictionary"}
+                   "login_err_mesg": "Incorrect session_id, it does not exist in the dictionary"}
 
         return HttpResponse(template.render(context, request))
 
@@ -171,7 +171,7 @@ def create_character(request, session_id):
         created_char_id = c.char_id
 
         # Print out a httpResponse to test
-        return HttpResponseRedirect("/home/" + session_id + "/" + str(created_char_id))
+        return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(created_char_id))
 
     return HttpResponse("Failed: This link is for get requests")
 
