@@ -20,4 +20,5 @@ from website import views as website_views
 urlpatterns = [
     url(r'^$', website_views.index , name = 'index'),
     url(r'^admin/', admin.site.urls),
+    url(r'^post_login/', website_views.respond_login, name= 'respond_login'),
 ]

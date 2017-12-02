@@ -1,0 +1,22 @@
+.centered {
+    width: 50%;
+    margin: 0 auto;
+}
+div.adjacent {
+    float: left;
+    display: inline-block;
+}
+div.padded-top {
+    padding-top: .5em
+}
+div.padded-bottom {
+    padding-bottom: .5em
+}
+
+p {
+    line-height: 0;
+    color: blue;
+}
+ {
+
+}

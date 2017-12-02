@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="centered">
+    <div class="adjacent" style="width: 50%; min-width: 12em">
+        <h2>Login</h2>
+        <form action="/post_login/" method="post">
+            {% csrf_token %}
+            {{ loginform }}
+            <input type="submit" value="Login">
+        </form>
+    </div>
+    <div class="adjacent" style="width: 50%; min-width: 12em">
+        <h2>Register</h2>
+        <form action="/post_register/" method="post">
+            {{ registerform }}
+            <input type="submit" value="Register">
+        </form>
+    </div>
+</div>
+</body>
+</html>
