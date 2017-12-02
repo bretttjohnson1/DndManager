@@ -131,5 +131,14 @@ def homepage(request, session_id):
         print(i, sessions[i])
     characters = Character.objects.raw("SELECT * FROM characters WHERE user_name_id = %s",[sessions[session_id]])
     context = {"characters": characters,
-               "username": sessions[session_id]}
+               "username": sessions[session_id],
+               "session_id": session_id}
     return HttpResponse(template.render(context, request))
+
+
+def create_character(request, session_id):
+    pass
+
+
+def edit_character(request, session_id, character_id):
+    pass
