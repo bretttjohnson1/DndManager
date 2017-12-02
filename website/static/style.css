@@ -7,12 +7,15 @@ div.adjacent {
     display: inline-block;
 }
 div.padded-top {
-    padding-top: .5em
+    padding-top: .5em;
 }
 div.padded-bottom {
-    padding-bottom: .5em
+    padding-bottom: .5em;
 }
-
+div.border {
+    border:2px solid black;
+    padding: 1em;
+}
 p {
     line-height: 1em;
 }
