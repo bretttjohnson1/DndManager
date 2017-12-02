@@ -20,5 +20,7 @@ from website import views as website_views
 urlpatterns = [
     url(r'^$', website_views.index , name = 'index'),
     url(r'^admin/', admin.site.urls),
-    url(r'^post_login/', website_views.respond_login, name= 'respond_login'),
+    url(r'^post_login/', website_views.respond_login, name= 'index'),
+    url(r'^post_register/', website_views.respond_register, name= 'index'),
+    url(r'^home/(?P<session_id>(.*))/$', website_views.homepage, name='home')
 ]

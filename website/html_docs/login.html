@@ -9,21 +9,34 @@
     <title>Title</title>
 </head>
 <body>
+<h1 align="center">DnD Manager</h1>
 <div class="centered">
-    <div class="adjacent" style="width: 50%; min-width: 12em">
-        <h2>Login</h2>
-        <form action="/post_login/" method="post">
-            {% csrf_token %}
-            {{ loginform }}
-            <input type="submit" value="Login">
-        </form>
+    <div class="adjacent" style="width: 50%">
+        <div style="max-width: 15em">
+            <h2>Login</h2>
+            <form action="/post_login/" method="post">
+                {% csrf_token %}
+                {{ loginform }}
+                <input type="submit" value="Login">
+            </form>
+            {% if login_err_mesg %}
+                <p class="red">{{ login_err_mesg }}</p>
+            {% endif %}
+        </div>
     </div>
-    <div class="adjacent" style="width: 50%; min-width: 12em">
-        <h2>Register</h2>
-        <form action="/post_register/" method="post">
-            {{ registerform }}
-            <input type="submit" value="Register">
-        </form>
+    <div class="adjacent" style="width: 50%">
+        <div style="max-width: 15em">
+            <h2>Register</h2>
+            <form action="/post_register/" method="post">
+                {% csrf_token %}
+
+                {{ registerform }}
+                <input type="submit" value="Register">
+            </form>
+            {% if register_err_mesg %}
+                <p class="red">{{ register_err_mesg }}</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 </body>

@@ -17,9 +17,9 @@ class Static_Race(models.Model):
 
 
 class User(models.Model):
-    user_id = models.AutoField(primary_key=True)
-    account_name = models.CharField(max_length=40)
-    password_hash = models.CharField(max_length=40)
+    account_name = models.CharField(primary_key=True, max_length=40)
+    password_salt = models.CharField(default="",max_length=40)
+    password_hash = models.CharField(max_length=512)
     class Meta:
         db_table = "users"
     def __str__(self):
@@ -37,7 +37,7 @@ class Game(models.Model):
 class Character(models.Model):
     char_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_name = models.ForeignKey(User, on_delete=models.CASCADE)
     game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
     race = models.ForeignKey(Static_Race)
     classname = models.CharField(max_length=40)

@@ -14,9 +14,8 @@ div.padded-bottom {
 }
 
 p {
-    line-height: 0;
-    color: blue;
+    line-height: 1em;
 }
- {
-
+p.red {
+    color: red;
 }
