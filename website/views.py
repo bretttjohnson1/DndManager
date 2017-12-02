@@ -29,7 +29,7 @@ def login_user(username):
         if logged_in[username][1] < 2700:
             return HttpResponseRedirect("/home/" + logged_in[username][0] + "/")
         else:
-            del sessions[username]
+            del logged_in[username]
 
     session_key = str(uuid.uuid4())
     logged_in[username] = (session_key,(time.time() * 1000000))
