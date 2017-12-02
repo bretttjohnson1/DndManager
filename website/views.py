@@ -102,7 +102,6 @@ def respond_register(request):
 
             # num_results = User.objects.filter(account_name=username).count()
 
-
             num_results = len(list(User.objects.raw("SELECT * from users where account_name = %s", [username])))
             if num_results > 0:
                 return register_fail(request,"User already exists")
@@ -141,8 +140,40 @@ def homepage(request, session_id):
     return HttpResponse(template.render(context, request))
 
 
+# This is called from the create_character/session_id
 def create_character(request, session_id):
-    pass
+    def fail_login(request):
+        template = loader.get_template('login.html')
+        context = {"loginform": LoginForm(),
+                   "registerform": RegisterForm(),
+                   "login_err_mesg": "Incorrection session_id, it does not exist in the dictionary"}
+
+        return HttpResponse(template.render(context, request))
+
+    # Check if a session id is even valid id
+    if session_id not in sessions:
+        return fail_login(request)
+
+    if request.method == "GET":
+        # Since user_name is a non-null foreign key, get the character's name from the map
+        foreignUsers = User.objects.raw("SELECT * FROM users WHERE account_name = %s", [sessions[session_id]])
+        foreignuser = foreignUsers[0] # Because we want the user, and not the user as part of a list
+
+        # insert a character, the auto incrementing field sets the char_id already
+        c = Character(name='default_name', user_name=foreignuser, game_id=None, classname='', level=0)
+        c.save()
+
+        # Also set base stats to the database
+        b = Base_Stats(char_id=c)
+        b.save()
+
+        # Now we pass this into edit_character
+        created_char_id = c.char_id
+
+        # Print out a httpResponse to test
+        return HttpResponseRedirect("/home/" + session_id + "/" + str(created_char_id))
+
+    return HttpResponse("Failed: This link is for get requests")
 
 
 def edit_character(request, session_id, character_id):
