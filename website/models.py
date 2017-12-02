@@ -55,7 +55,7 @@ class Inventory(models.Model):
     quantity = models.IntegerField(default=0)
 
     class Meta:
-        unique_together = (("char_id", "item_name"))
+        unique_together = (("char_id", "item_name"),)
         db_table = "inventories"
     def __str__(self):
         return self.item_name
@@ -73,7 +73,7 @@ class Weapon(models.Model):
     quantity = models.IntegerField(default=0)
     desc = models.CharField(max_length=4000)
     class Meta:
-        unique_together = (("char_id", "name"))
+        unique_together = (("char_id", "name"),)
         db_table = "weapons"
     def __str__(self):
         return self.name
@@ -87,7 +87,7 @@ class Armor(models.Model):
     type = models.CharField(max_length=40)
     desc = models.CharField(max_length=4000)
     class Meta:
-        unique_together = (("char_id", "name"))
+        unique_together = (("char_id", "name"),)
         db_table = "armors"
     def __str__(self):
         return self.name
@@ -112,7 +112,7 @@ class Feats(models.Model):
     name = models.CharField(max_length=40)
     desc = models.CharField(max_length=400)
     class Meta:
-        unique_together = (("char_id", "name"))
+        unique_together = (("char_id", "name"),)
         db_table = "feats"
     def __str__(self):
         return self.name
@@ -135,7 +135,7 @@ class Skills(models.Model):
     class_mod = models.IntegerField(default=0)
     race_mod = models.IntegerField(default=0)
     class Meta:
-        unique_together = (("char_id", "skill_name"))
+        unique_together = (("char_id", "skill_name"),)
         db_table = "skills"
     def __str__(self):
         return self.name

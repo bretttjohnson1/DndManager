@@ -25,6 +25,7 @@ def index(request):
 
 
 def login_user(username):
+
     if username in logged_in:
         if logged_in[username][1] < 2700:
             return HttpResponseRedirect("/home/" + logged_in[username][0] + "/")
@@ -124,6 +125,7 @@ def homepage(request, session_id):
 
     if session_id not in sessions:
         return fail_session()
+
     template = loader.get_template('homepage.html')
     for i in sessions:
         print(i, sessions[i])
