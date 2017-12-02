@@ -38,8 +38,8 @@ class Character(models.Model):
     char_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
-    game_id = models.ForeignKey(Game, on_delete=models.CASCADE)
-    race = models.ForeignKey(Static_Race)
+    game_id = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)
+    race = models.ForeignKey(Static_Race, default="Half-Orc")
     classname = models.CharField(max_length=40)
     level = models.IntegerField(default=0)
     class Meta:
@@ -121,7 +121,7 @@ class Feats(models.Model):
 class Skills(models.Model):
     char_id = models.ForeignKey(Character, on_delete=models.CASCADE)
     skill_name = models.CharField(max_length=40)
-    abilit_choices = [
+    ability_choices = [
         ("str","str"),
         ("dex","dex"),
         ("con","con"),
@@ -130,7 +130,7 @@ class Skills(models.Model):
         ("cha","cha")
 
     ]
-    relevant_ability = models.CharField(max_length=3, choices=abilit_choices)
+    relevant_ability = models.CharField(max_length=3, choices=ability_choices)
     ranks = models.IntegerField(default=0)
     class_mod = models.IntegerField(default=0)
     race_mod = models.IntegerField(default=0)
