@@ -240,7 +240,7 @@ def edit_character(request, session_id, character_id):
 
 
     weapon_form_data = FormData("Weapons","update_weapon", "add_weapon", "delete_weapon")
-    armor_form_data = FormData("Armor", "update_armor", "add_armor", "delete_weapon")
+    armor_form_data = FormData("Armor", "update_armor", "add_armor", "delete_armor")
     feats_form_data = FormData("Feats", "update_feat", "add_feat","delete_feat")
     skills_form_data = FormData("Skills", "update_skill")
 
@@ -474,11 +474,44 @@ def update_skills_entry(request, session_id, character_id, skill_id):
 
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
-def delete_armor_entry(request, seesion_id, character_id, armor_id):
-    pass
+def delete_armor_entry(request, session_id, character_id, armor_id):
+    if session_id not in sessions:
+        return fail_session(request)
 
-def delete_weapon_entry(request, seesion_id, character_id, weapon_id):
-    pass
+    # Delete armor from database, and redirect back to the edit character page
+    if request.method == "GET":
+        # If the armor exists in the database, delete it. Otherwise, don't.
+        armors = Armor.objects.raw("SELECT * FROM armors WHERE id = %s", [armor_id])
 
-def delete_character_entry(request, seesion_id, character_id):
-    pass
+        for armor in armors:
+            armor.delete()
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+
+def delete_weapon_entry(request, session_id, character_id, weapon_id):
+    if session_id not in sessions:
+        return fail_session(request)
+
+    # Delete weapon from database, and redirect back to the edit character page
+    if request.method == "GET":
+        # If the weapon exists in the database, delete it. Otherwise, don't.
+        weapons = Weapon.objects.raw("SELECT * FROM weapons WHERE id = %s", [weapon_id])
+
+        for weapon in weapons:
+            weapon.delete()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+def delete_character_entry(request, session_id, character_id):
+    if session_id not in sessions:
+        return fail_session(request)
+
+    # Delete weapon from database, and redirect back to the edit character page
+    if request.method == "GET":
+        # If the weapon exists in the database, delete it. Otherwise, don't.
+        characters = Character.objects.raw("SELECT * FROM characters WHERE char_id = %s", [character_id])
+
+        for character in characters:
+            character.delete()
+
+    return HttpResponseRedirect("/home/" + session_id + "/")
