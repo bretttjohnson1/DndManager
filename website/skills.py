@@ -14,3 +14,6 @@ def static_skill_list():
                    'Wis', 'Str']
 
     return list(zip(static_skills,skill_stats))
+
+def base_to_bonus(base_val):
+    return int(base_val/2)-5
