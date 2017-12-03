@@ -154,6 +154,56 @@ def homepage(request, session_id):
                "session_id": session_id}
     return HttpResponse(template.render(context, request))
 
+def create_game(request, session_id):
+    def fail_login(request):
+        template = loader.get_template('login.html')
+        context = {"loginform": LoginForm(),
+                   "registerform": RegisterForm(),
+                   "login_err_mesg": "Incorrect session_id, it does not exist in the dictionary"}
+
+        return HttpResponse(template.render(context, request))
+
+    # Check if a session id is a valid id
+    if session_id not in sessions:
+        return fail_login(request)
+    if request.method == "GET":
+        return HttpResponseRedirect("/edit_game/" + session_id + "/")
+
+    return HttpResponse("Failed: create_game is for get requests")
+
+def edit_game(request, session_id):
+    def fail_login(request):
+        template = loader.get_template('login.html')
+        context = {"loginform": LoginForm(),
+                   "registerform": RegisterForm(),
+                   "login_err_mesg": "Incorrect session_id, it does not exist in the dictionary"}
+
+        return HttpResponse(template.render(context, request))
+
+    # Check if a session id is a valid id
+    if session_id not in sessions:
+        return fail_login(request)
+    if request.method == "GET":
+        template = loader.get_template('edit_game.html')
+        context = {"gameform": GameModelForm(),}
+
+        return HttpResponse(template.render(context, request))
+
+    if request.method == "POST":
+        print("RECieved post")
+        form = GameModelForm(request.POST)
+        if form.is_valid():
+            # Read game data
+            name = form.cleaned_data['game_name']
+            dm = form.cleaned_data['ran_by']
+
+            # Create game
+            g = Game(game_name=name, ran_by=dm)
+            g.save()
+            return HttpResponseRedirect("/home/" + session_id + "/")
+
+    return HttpResponseRedirect("/home/" + session_id + "/")
+
 
 # This is called from the create_character/session_id
 def create_character(request, session_id):
