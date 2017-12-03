@@ -39,7 +39,7 @@ urlpatterns = [
         name='update_weapon'),
     url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/delete_armor/(?P<armor_id>\d+)/$', website_views.delete_armor_entry,
         name='delete_armor'),
-    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/delete_weapon/(?P<weapon_id>\d+)/$', website_views.delete_armor_entry,
+    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/delete_weapon/(?P<weapon_id>\d+)/$', website_views.delete_weapon_entry,
         name='delete_weapon'),
     url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/$', website_views.edit_character, name='edit_character'),
     url(r'^create_character/(?P<session_id>(.*))/$', website_views.create_character, name='create_character'),
