@@ -40,6 +40,18 @@ class ArmorModelForm(ModelForm):
         fields = ['name','armor_bonus','armor_check_penalty','type','desc']
 
 
+class FeatsModelForm(ModelForm):
+    class Meta:
+        model = Feats
+        fields = ['name','desc']
+
+
+class SkillsModelForm(ModelForm):
+    class Meta:
+        model = Skills
+        fields = ['ranks','class_mod','race_mod']
+
+
 class FormData():
     def __init__(self, formname, formurl, addurl=None, deleteurl=None):
         self.formname = formname
