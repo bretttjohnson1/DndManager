@@ -22,7 +22,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^post_login/', website_views.respond_login, name= 'index'),
     url(r'^post_register/', website_views.respond_register, name= 'index'),
-    url(r'^home/(?P<session_id>(.*))/$', website_views.homepage, name='home'),
 
     url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/delete_character/$', website_views.delete_character_entry,
         name='delete_character'),
@@ -59,8 +58,10 @@ urlpatterns = [
     url(r'^create_character/(?P<session_id>(.*))/$', website_views.create_character, name='create_character'),
 
     url(r'^create_game/(?P<session_id>(.*))/$', website_views.create_game, name='create_game'),
+    url(r'^home/(?P<session_id>(.*))/delete_game/(?P<game_id>\d+)/$', website_views.delete_game_entry, name='delete_game'),
 
-    url(r'^edit_game/(?P<session_id>(.*))/delete_game/(?P<game_id>)', website_views.edit_game, name='edit_game'),
-    url(r'^edit_game/(?P<session_id>(.*))/update/', website_views.edit_game, name='edit_game'),
+    url(r'^edit_game/(?P<session_id>(.*))/update/$', website_views.edit_game, name='edit_game'),
     url(r'^edit_game/(?P<session_id>(.*))/$', website_views.edit_game, name='edit_game'),
+    url(r'^home/(?P<session_id>(.*))/$', website_views.homepage, name='home')
+
 ]

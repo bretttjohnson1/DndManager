@@ -591,7 +591,7 @@ def delete_feat_entry(request, session_id, character_id, feat_id):
 
     if request.method == "GET":
         # IF the feat exists in the database, delete it. Otherwise, don't.
-        feats = Feats.objects.raw("SELECT * FROM feats WHERE char_id_id = %s", [character_id])
+        feats = Feats.objects.raw("SELECT * FROM feats WHERE id = %s", [feat_id])
 
         for feat in feats:
             feat.delete()
