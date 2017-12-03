@@ -578,3 +578,9 @@ def delete_character_entry(request, session_id, character_id):
             character.delete()
 
     return HttpResponseRedirect("/home/" + session_id + "/")
+
+def delete_feat_entry(request, session_id, character_id, feat_id):
+    pass
+
+def delete_game_entry(request, session_id, game_id):
+    pass
