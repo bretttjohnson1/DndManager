@@ -217,7 +217,7 @@ def edit_character(request, session_id, character_id):
 
     stats = stats_list[0]
     character_form = CharacterModelForm(instance=character)
-    character_form_data = FormData("Character Info","update_character_info")
+    character_form_data = FormData("Character Info","update_character_info",None,"delete_character")
     stats_form =  BaseStatsModelForm(instance=stats)
     stats_form_data = FormData("Character Stats","update_stats")
     weapons_list_forms = []
@@ -227,8 +227,9 @@ def edit_character(request, session_id, character_id):
 
     for armor in armor_list:
         armor_list_forms.append((int(armor.id), ArmorModelForm(instance=armor)))
-    weapon_form_data = FormData("Weapons","update_weapon", "add_weapon")
-    armor_form_data = FormData("Armor", "update_armor", "add_armor")
+
+    weapon_form_data = FormData("Weapons","update_weapon", "add_weapon", "delete_weapon")
+    armor_form_data = FormData("Armor", "update_armor", "add_armor", "delete_weapon")
 
 
     template = loader.get_template('edit_character.html')
@@ -393,3 +394,11 @@ def update_armor_entry(request, session_id, character_id,armor_id):
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
 
+def delete_armor_entry(request, seesion_id, character_id, armor_id):
+    pass
+
+def delete_weapon_entry(request, seesion_id, character_id, weapon_id):
+    pass
+
+def delete_character_entry(request, seesion_id, character_id):
+    pass

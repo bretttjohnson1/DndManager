@@ -41,8 +41,9 @@ class ArmorModelForm(ModelForm):
 
 
 class FormData():
-    def __init__(self, formname, formurl, addurl=None):
+    def __init__(self, formname, formurl, addurl=None, deleteurl=None):
         self.formname = formname
         self.formurl = formurl
         self.addurl = addurl
+        self.deleteurl = deleteurl
 

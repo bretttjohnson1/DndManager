@@ -21,8 +21,12 @@
              <br>
              <input type="submit" value="Submit">
             </form>
+            {% if formdata.deleteurl %}
+            <a href="{{formdata.deleteurl}}/">
+                <button>Delete</button>
+            </a>
+            {% endif %}
         </div>
-
     {% endfor %}
 {% endif %}
 {% if multiforms %}
@@ -36,7 +40,13 @@
                         {{ mform|linebreaksbr }}
                      <br>
                      <input type="submit" value="Submit">
+
                     </form>
+                    {% if formdata.deleteurl %}
+                    <a href="{{formdata.deleteurl}}/{{id}}/">
+                        <button>Delete</button>
+                    </a>
+                    {% endif %}
                 </div>
             {% endfor %}
         {% if formdata.addurl %}
