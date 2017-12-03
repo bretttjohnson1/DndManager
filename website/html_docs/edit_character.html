@@ -15,7 +15,7 @@
     {% for form, formdata in forms %}
         <div class="adjacent border">
             <h2>{{ formdata.formname }}</h2>
-            <form action="{{formdata.formurl}}" method="post">
+            <form action="{{formdata.formurl}}/" method="post">
                 {% csrf_token %}
                 {{ form|linebreaksbr }}
              <br>
