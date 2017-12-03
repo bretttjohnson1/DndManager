@@ -9,7 +9,7 @@ import time
 from website.models import *
 from website.forms import *
 from website.skills import static_skill_list
-
+from django.db import connection
 
 # Create your views here.
 sessions = {}
@@ -542,6 +542,7 @@ def update_skills_entry(request, session_id, character_id, skill_id):
 
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
+
 def delete_armor_entry(request, session_id, character_id, armor_id):
     if session_id not in sessions:
         return fail_session(request)
@@ -549,10 +550,10 @@ def delete_armor_entry(request, session_id, character_id, armor_id):
     # Delete armor from database, and redirect back to the edit character page
     if request.method == "GET":
         # If the armor exists in the database, delete it. Otherwise, don't.
-        armors = Armor.objects.raw("SELECT * FROM armors WHERE id = %s", [armor_id])
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM armors WHERE id = %s', [armor_id])
+        connection.commit()
 
-        for armor in armors:
-            armor.delete()
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
 
@@ -563,10 +564,9 @@ def delete_weapon_entry(request, session_id, character_id, weapon_id):
     # Delete weapon from database, and redirect back to the edit character page
     if request.method == "GET":
         # If the weapon exists in the database, delete it. Otherwise, don't.
-        weapons = Weapon.objects.raw("SELECT * FROM weapons WHERE id = %s", [weapon_id])
-
-        for weapon in weapons:
-            weapon.delete()
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM weapons WHERE id = %s', [weapon_id])
+        connection.commit()
 
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
@@ -574,13 +574,12 @@ def delete_character_entry(request, session_id, character_id):
     if session_id not in sessions:
         return fail_session(request)
 
-    # Delete weapon from database, and redirect back to the edit character page
+    # Delete character from database, and redirect back to the edit character page
     if request.method == "GET":
         # If the weapon exists in the database, delete it. Otherwise, don't.
-        characters = Character.objects.raw("SELECT * FROM characters WHERE char_id = %s", [character_id])
-
-        for character in characters:
-            character.delete()
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM characters WHERE char_id = %s', [character_id])
+        connection.commit()
 
     return HttpResponseRedirect("/home/" + session_id + "/")
 
@@ -591,10 +590,9 @@ def delete_feat_entry(request, session_id, character_id, feat_id):
 
     if request.method == "GET":
         # IF the feat exists in the database, delete it. Otherwise, don't.
-        feats = Feats.objects.raw("SELECT * FROM feats WHERE id = %s", [feat_id])
-
-        for feat in feats:
-            feat.delete()
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM feats WHERE id = %s', [feat_id])
+        connection.commit()
 
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
@@ -605,9 +603,8 @@ def delete_game_entry(request, session_id, game_id):
 
     if request.method == "GET":
         # IF the game exists in the database, delete it. Otherwise, don't.
-        games = Game.objects.raw("SELECT * FROM games WHERE game_id = %s", [game_id])
-
-        for game in games:
-            game.delete()
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM games WHERE game_id = %s', [game_id])
+        connection.commit()
 
     return HttpResponseRedirect("/home/" + session_id + "/")
