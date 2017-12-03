@@ -9,7 +9,10 @@ import time
 from website.models import *
 from website.forms import *
 from website.skills import static_skill_list
+
 from django.db import connection
+from website.skills import base_to_bonus
+
 
 # Create your views here.
 sessions = {}
@@ -238,7 +241,6 @@ def create_character(request, session_id):
 
         static_skills = static_skill_list()
         for skill in static_skills:
-            print(skill)
             skillmodel = Skills(char_id=c, skill_name=skill[0],relevant_ability=skill[1])
             skillmodel.save()
 
@@ -272,12 +274,27 @@ def edit_character(request, session_id, character_id):
     feats_list = list(Feats.objects.raw("SELECT * FROM feats WHERE char_id_id = %s", [str(character_id), ]))
     skills_list = list(Skills.objects.raw("SELECT * FROM skills WHERE char_id_id = %s", [str(character_id), ]))
 
+    character_race = \
+    list(Static_Race.objects.raw("SELECT * FROM static_race WHERE race_name = %s", [str(character.race_id), ]))[0]
+
     if len(stats_list) > 1:
         return fail_invalid_db(request)
     if len(stats_list) == 0:
         return HttpResponse("NO stats of id " + str(character_id))
 
     stats = stats_list[0]
+    stats_names = ["str", "con", "dex", "int", "wis", "cha"]
+
+    stat_values = [(stats.str + character_race.strmod),
+                    (stats.con + character_race.conmod),
+                    (stats.dex + character_race.dexmod),
+                    (stats.int + character_race.intmod),
+                    (stats.wis + character_race.wismod),
+                    (stats.cha + character_race.chamod)]
+    stat_bonuses = list(map(base_to_bonus, stat_values))
+
+    stat_map = {k:v for k,v in zip(stats_names,stat_bonuses)}
+
     character_form = CharacterModelForm(instance=character)
     character_form_data = FormData("Character Info","update_character_info",None,"delete_character")
     stats_form =  BaseStatsModelForm(instance=stats)
@@ -298,8 +315,18 @@ def edit_character(request, session_id, character_id):
 
     for skills in skills_list:
         # todo calculate total skill mod
-        skills_list_forms.append((int(skills.id), SkillsModelForm(instance=skills),
-                                 SkillData(str(skills.skill_name), str(skills.relevant_ability), 0)))
+        skillform = SkillsModelForm(instance=skills)
+        stat = stat_map[str(skills.relevant_ability).lower()]
+        if int(skills.class_mod) >= 1:
+            stat += 3 + int(skills.class_mod) - 1
+        stat += int(skills.race_mod)
+        if int(skills.ranks) > 0:
+            stat += skills.ranks
+        else:
+            stat = 0
+
+        skills_list_forms.append((int(skills.id), skillform,
+                                 SkillData(str(skills.skill_name), str(skills.relevant_ability), stat)))
 
 
     weapon_form_data = FormData("Weapons","update_weapon", "add_weapon", "delete_weapon")
@@ -314,11 +341,16 @@ def edit_character(request, session_id, character_id):
     multiformdatalist = [weapon_form_data, armor_form_data, feats_form_data]
 
     template = loader.get_template('edit_character.html')
-    context = {"forms": zip(formlist, formdatalist),
-               "multiforms": zip(multiformlist,multiformdatalist),
-               "skillmultiforms": skills_list_forms,
-               "skillformdata": skills_form_data,
-               "username": username}
+    context = {}
+    context["forms"] = zip(formlist, formdatalist)
+    context["multiforms"] = zip(multiformlist,multiformdatalist)
+    context["skillmultiforms"] =  skills_list_forms
+    context["skillformdata"] = skills_form_data
+    context["username"] = username
+
+    # display stats
+
+    context["stats"] = zip(stats_names, stat_bonuses)
 
     return HttpResponse(template.render(context, request))
 

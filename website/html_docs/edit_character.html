@@ -12,6 +12,13 @@
 {% endif %}
 <body>
 <div>
+{% if stats %}
+    <div class="adjacent border">
+    {% for stat_name,stat_val in stats %}
+        <h2>{{stat_name}}: {{stat_val}}</h2>
+    {% endfor %}
+    </div>
+{% endif %}
 {% if forms %}
     {% for form, formdata in forms %}
         <div class="adjacent border">
