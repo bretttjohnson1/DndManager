@@ -20,7 +20,7 @@ class SessionForm(forms.Form):
 class GameModelForm(ModelForm):
     class Meta:
         model = Game
-        fields = ['game_name', 'ran_by']
+        fields = ['game_name']
 
 class CharacterModelForm(ModelForm):
     class Meta:

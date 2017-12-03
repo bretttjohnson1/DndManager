@@ -200,7 +200,7 @@ def edit_game(request, session_id):
         if form.is_valid():
             # Read game data
             name = form.cleaned_data['game_name']
-            dm = form.cleaned_data['ran_by']
+            dm = list(User.objects.raw("SELECT * FROM users WHERE account_name = %s", [sessions[session_id]]))[0]
 
             # Create game
             g = Game(game_name=name, ran_by=dm)
