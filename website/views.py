@@ -2,14 +2,13 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import loader
-from website.forms import LoginForm
-from website.forms import RegisterForm
 import hashlib
 import random
 import uuid
 import time
 from website.models import *
 from website.forms import *
+from website.skills import static_skill_list
 
 
 # Create your views here.
@@ -127,7 +126,7 @@ def respond_register(request):
 
             num_results = len(list(User.objects.raw("SELECT * from users where account_name = %s", [username])))
             if num_results > 0:
-                return register_fail(request,"User already exists")
+                return register_fail(request, "User already exists")
 
             new_user = User(account_name=form.cleaned_data['username'], password_hash=passhash, password_salt=salt)
             new_user.save()
@@ -182,6 +181,12 @@ def create_character(request, session_id):
         b = Base_Stats(char_id=c)
         b.save()
 
+        static_skills = static_skill_list()
+        for skill in static_skills:
+            print(skill)
+            skillmodel = Skills(char_id=c, skill_name=skill[0],relevant_ability=skill[1])
+            skillmodel.save()
+
         # Now we pass this into edit_character
         created_char_id = c.char_id
 
@@ -225,6 +230,7 @@ def edit_character(request, session_id, character_id):
     weapons_list_forms = []
     armor_list_forms = []
     feats_list_forms = []
+
     skills_list_forms = []
     for weapon in weapons_list:
         weapons_list_forms.append((int(weapon.id), WeaponModelForm(instance=weapon)))
@@ -236,7 +242,9 @@ def edit_character(request, session_id, character_id):
         feats_list_forms.append((int(feats.id), FeatsModelForm(instance=feats)))
 
     for skills in skills_list:
-        skills_list_forms.append((int(skills.id), FeatsModelForm(instance=skills)))
+        # todo calculate total skill mod
+        skills_list_forms.append((int(skills.id), SkillsModelForm(instance=skills),
+                                 SkillData(str(skills.skill_name), str(skills.relevant_ability), 0)))
 
 
     weapon_form_data = FormData("Weapons","update_weapon", "add_weapon", "delete_weapon")
@@ -247,12 +255,14 @@ def edit_character(request, session_id, character_id):
     formlist = [character_form, stats_form]
     formdatalist = [character_form_data, stats_form_data]
 
-    multiformlist = [weapons_list_forms,armor_list_forms,feats_list_forms, skills_list_forms]
-    multiformdatalist = [weapon_form_data, armor_form_data, feats_form_data, skills_form_data]
+    multiformlist = [weapons_list_forms,armor_list_forms,feats_list_forms]
+    multiformdatalist = [weapon_form_data, armor_form_data, feats_form_data]
 
     template = loader.get_template('edit_character.html')
     context = {"forms": zip(formlist, formdatalist),
                "multiforms": zip(multiformlist,multiformdatalist),
+               "skillmultiforms": skills_list_forms,
+               "skillformdata": skills_form_data,
                "username": username}
 
     return HttpResponse(template.render(context, request))
@@ -462,15 +472,18 @@ def update_skills_entry(request, session_id, character_id, skill_id):
         form = SkillsModelForm(request.POST)
         if form.is_valid():
             character_id = int(character_id)
-            feat_list = list(
-                Skills.objects.raw("SELECT * FROM feats WHERE id = %s", [skill_id]))
+            skill_list = list(
+                Skills.objects.raw("SELECT * FROM skills WHERE id = %s", [skill_id,]))
 
-            if len(feat_list) != 1:
+            if len(skill_list) != 1:
                 return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
-            feat = feat_list[0]
-            feat.name = form.cleaned_data["ranks"]
-            feat.save()
+            skill = skill_list[0]
+            skill.ranks = form.cleaned_data["ranks"]
+            skill.race_mod = form.cleaned_data["race_mod"]
+            skill.class_mod = form.cleaned_data["class_mod"]
+
+            skill.save()
 
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 

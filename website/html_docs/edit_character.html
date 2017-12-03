@@ -11,6 +11,7 @@
 <h1>Editing {{ username}}'s Character</h1>
 {% endif %}
 <body>
+<div>
 {% if forms %}
     {% for form, formdata in forms %}
         <div class="adjacent border">
@@ -55,8 +56,26 @@
             </a>
         {% endif %}
         </div>
-
     {% endfor %}
 {% endif %}
+<div class="adjacent border">
+{% if skillformdata and skillmultiforms %}
+    <h2>{{ skillformdata.formname }}</h2>
+    {% for sid, mform, skillinfo in skillmultiforms %}
+            <div class="border">
+                <h4>{{ skillinfo.name }}</h4>
+                <h5>{{ skillinfo.skilltype}} Bonus = {{ skillinfo.final_mod }}</h5>
+                <form action="{{skillformdata.formurl}}/{{sid}}/" method="post">
+                    {% csrf_token %}
+                    {{ mform|linebreaksbr }}
+                 <br>
+                 <input type="submit" value="Submit">
+
+                </form>
+            </div>
+    {% endfor %}
+{% endif %}
+</div>
+</div>
 </body>
 </html>

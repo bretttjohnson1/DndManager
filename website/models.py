@@ -125,16 +125,7 @@ class Feats(models.Model):
 class Skills(models.Model):
     char_id = models.ForeignKey(Character, on_delete=models.CASCADE)
     skill_name = models.CharField(max_length=40)
-    ability_choices = [
-        ("str","str"),
-        ("dex","dex"),
-        ("con","con"),
-        ("int","int"),
-        ("wis","wis"),
-        ("cha","cha")
-
-    ]
-    relevant_ability = models.CharField(max_length=3, choices=ability_choices)
+    relevant_ability = models.CharField(max_length=3)
     ranks = models.IntegerField(default=0)
     class_mod = models.IntegerField(default=0)
     race_mod = models.IntegerField(default=0)
@@ -142,5 +133,5 @@ class Skills(models.Model):
         unique_together = (("char_id", "skill_name"),)
         db_table = "skills"
     def __str__(self):
-        return self.name
+        return str((self.char_id,self.skill_name))
 
