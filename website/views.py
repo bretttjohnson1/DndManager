@@ -189,7 +189,6 @@ def edit_game(request, session_id):
         return HttpResponse(template.render(context, request))
 
     if request.method == "POST":
-        print("RECieved post")
         form = GameModelForm(request.POST)
         if form.is_valid():
             # Read game data
@@ -579,8 +578,30 @@ def delete_character_entry(request, session_id, character_id):
 
     return HttpResponseRedirect("/home/" + session_id + "/")
 
+
 def delete_feat_entry(request, session_id, character_id, feat_id):
-    pass
+    if session_id not in sessions:
+        return fail_session(request)
+
+    if request.method == "GET":
+        # IF the feat exists in the database, delete it. Otherwise, don't.
+        feats = Feats.objects.raw("SELECT * FROM feats WHERE char_id_id = %s", [character_id])
+
+        for feat in feats:
+            feat.delete()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
 
 def delete_game_entry(request, session_id, game_id):
-    pass
+    if session_id not in sessions:
+        return fail_session(request)
+
+    if request.method == "GET":
+        # IF the game exists in the database, delete it. Otherwise, don't.
+        games = Game.objects.raw("SELECT * FROM games WHERE game_id = %s", [game_id])
+
+        for game in games:
+            game.delete()
+
+    return HttpResponseRedirect("/home/" + session_id + "/")
