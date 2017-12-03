@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Game</title>
+</head>
+<body>
+<div>
+    <form action="update/" method="post">
+        {% csrf_token %}
+        {{ gameform }}
+    <input type="submit" value="Add">
+    </form>
+</div>
+</body>

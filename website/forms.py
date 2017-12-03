@@ -2,6 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from website.models import *
 
+
 class LoginForm(forms.Form):
     username = forms.CharField(label="User Name", max_length=100)
     password = forms.CharField(label="Password", max_length=100, widget=forms.PasswordInput())
@@ -15,6 +16,11 @@ class RegisterForm(forms.Form):
 
 class SessionForm(forms.Form):
     session_key = forms.HiddenInput()
+
+class GameModelForm(ModelForm):
+    class Meta:
+        model = Game
+        fields = ['game_name', 'ran_by']
 
 class CharacterModelForm(ModelForm):
     class Meta:

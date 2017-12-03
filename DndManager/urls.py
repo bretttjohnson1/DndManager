@@ -55,5 +55,7 @@ urlpatterns = [
 
     url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/$', website_views.edit_character, name='edit_character'),
     url(r'^create_character/(?P<session_id>(.*))/$', website_views.create_character, name='create_character'),
-
+    url(r'^create_game/(?P<session_id>(.*))/$', website_views.create_game, name='create_game'),
+    url(r'^edit_game/(?P<session_id>(.*))/update/', website_views.edit_game, name='edit_game'),
+    url(r'^edit_game/(?P<session_id>(.*))/$', website_views.edit_game, name='edit_game'),
 ]
