@@ -1,3 +1,9 @@
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
+from website.views import *
+from website.forms import *
+from django.db import connection
+
 def static_skill_list():
     static_skills = ['Acrobatics', 'Appraise', 'Bluff', 'Climb', 'Craft', 'Diplomacy', 'Disable Device', 'Disguise',
                      'Escape Artist', 'Fly', 'Handle Animal', 'Heal', 'Intimidate', 'Knowledge (arcana)',
