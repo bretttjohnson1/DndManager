@@ -209,6 +209,8 @@ def edit_character(request, session_id, character_id):
     stats_list = list(Base_Stats.objects.raw("SELECT * FROM base_stats WHERE char_id_id = %s",[str(character_id),]))
     weapons_list = list(Weapon.objects.raw("SELECT * FROM weapons WHERE char_id_id = %s", [str(character_id), ]))
     armor_list = list(Armor.objects.raw("SELECT * FROM armors WHERE char_id_id = %s", [str(character_id), ]))
+    feats_list = list(Feats.objects.raw("SELECT * FROM feats WHERE char_id_id = %s", [str(character_id), ]))
+    skills_list = list(Skills.objects.raw("SELECT * FROM skills WHERE char_id_id = %s", [str(character_id), ]))
 
     if len(stats_list) > 1:
         return fail_invalid_db(request)
@@ -222,20 +224,35 @@ def edit_character(request, session_id, character_id):
     stats_form_data = FormData("Character Stats","update_stats")
     weapons_list_forms = []
     armor_list_forms = []
+    feats_list_forms = []
+    skills_list_forms = []
     for weapon in weapons_list:
         weapons_list_forms.append((int(weapon.id), WeaponModelForm(instance=weapon)))
 
     for armor in armor_list:
         armor_list_forms.append((int(armor.id), ArmorModelForm(instance=armor)))
 
+    for feats in feats_list:
+        feats_list_forms.append((int(feats.id), FeatsModelForm(instance=feats)))
+
+    for skills in skills_list:
+        skills_list_forms.append((int(skills.id), FeatsModelForm(instance=skills)))
+
+
     weapon_form_data = FormData("Weapons","update_weapon", "add_weapon", "delete_weapon")
     armor_form_data = FormData("Armor", "update_armor", "add_armor", "delete_weapon")
+    feats_form_data = FormData("Feats", "update_feat", "add_feat","delete_feat")
+    skills_form_data = FormData("Skills", "update_skill")
 
+    formlist = [character_form, stats_form]
+    formdatalist = [character_form_data, stats_form_data]
+
+    multiformlist = [weapons_list_forms,armor_list_forms,feats_list_forms, skills_list_forms]
+    multiformdatalist = [weapon_form_data, armor_form_data, feats_form_data, skills_form_data]
 
     template = loader.get_template('edit_character.html')
-
-    context = {"forms": zip([character_form, stats_form], [character_form_data,stats_form_data]),
-               "multiforms": zip([weapons_list_forms,armor_list_forms],[weapon_form_data, armor_form_data]),
+    context = {"forms": zip(formlist, formdatalist),
+               "multiforms": zip(multiformlist,multiformdatalist),
                "username": username}
 
     return HttpResponse(template.render(context, request))
@@ -364,8 +381,8 @@ def add_armor_entry(request, session_id, character_id):
             return character_response
         character = character_response
 
-        new_weapon = Armor(char_id=character, name="",type="",desc="")
-        new_weapon.save()
+        new_armor = Armor(char_id=character, name="",type="",desc="")
+        new_armor.save()
 
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
@@ -393,6 +410,69 @@ def update_armor_entry(request, session_id, character_id,armor_id):
 
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
+
+def add_feats_entry(request, session_id, character_id):
+    if session_id not in sessions:
+        return fail_session(request)
+    if request.method == "GET":
+        character_id = int(character_id)
+
+        feats_list = list(
+            Feats.objects.raw("SELECT * FROM feats WHERE char_id_id = %s AND name = %s",
+                              [str(character_id), ""]))
+        if len(feats_list) > 0:
+            HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+        character_response = get_unique_character_instance(request, character_id)
+        if type(character_response) != Character:
+            return character_response
+        character = character_response
+
+        new_feat = Feats(char_id=character, name="",desc="")
+        new_feat.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+
+def update_feats_entry(request, session_id, character_id,feat_id):
+    if session_id not in sessions:
+        return fail_session(request)
+    if request.method == "POST":
+        form = FeatsModelForm(request.POST)
+        if form.is_valid():
+            character_id = int(character_id)
+            feat_list = list(
+                Feats.objects.raw("SELECT * FROM feats WHERE id = %s", [feat_id]))
+
+            if len(feat_list) != 1:
+                return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+            feat = feat_list[0]
+            feat.name = form.cleaned_data["name"]
+            feat.desc = form.cleaned_data["desc"]
+            feat.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+
+def update_skills_entry(request, session_id, character_id, skill_id):
+    if session_id not in sessions:
+        return fail_session(request)
+    if request.method == "POST":
+        form = SkillsModelForm(request.POST)
+        if form.is_valid():
+            character_id = int(character_id)
+            feat_list = list(
+                Skills.objects.raw("SELECT * FROM feats WHERE id = %s", [skill_id]))
+
+            if len(feat_list) != 1:
+                return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+            feat = feat_list[0]
+            feat.name = form.cleaned_data["ranks"]
+            feat.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
 def delete_armor_entry(request, seesion_id, character_id, armor_id):
     pass
