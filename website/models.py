@@ -38,7 +38,7 @@ class Character(models.Model):
     char_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=40)
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
-    game_id = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)
+    game_id = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True)
     race = models.ForeignKey(Static_Race, default="Half-Orc")
     classname = models.CharField(max_length=40)
     level = models.IntegerField(default=0)
@@ -49,6 +49,7 @@ class Character(models.Model):
 
 
 class Inventory(models.Model):
+    id = models.AutoField(primary_key=True)
     char_id = models.ForeignKey(Character, on_delete=models.CASCADE)
     item_name = models.CharField(max_length=40)
     item_desc = models.CharField(max_length=40)
@@ -62,6 +63,7 @@ class Inventory(models.Model):
 
 
 class Weapon(models.Model):
+    id = models.AutoField(primary_key=True)
     char_id = models.ForeignKey(Character, on_delete=models.CASCADE)
     name = models.CharField(max_length=40)
     number_damage_dice = models.IntegerField(default=0)
@@ -70,27 +72,29 @@ class Weapon(models.Model):
     critical = models.CharField(max_length=40)
     type = models.CharField(max_length=40)
     range = models.CharField(max_length=40)
-    quantity = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=1)
     desc = models.CharField(max_length=4000)
     class Meta:
         unique_together = (("char_id", "name"),)
         db_table = "weapons"
     def __str__(self):
-        return self.name
+        return str(self.id)
 
 
 class Armor(models.Model):
+    id = models.AutoField(primary_key=True)
     char_id = models.ForeignKey(Character, on_delete=models.CASCADE)
     name = models.CharField(max_length=40)
     armor_bonus = models.IntegerField(default=0)
     armor_check_penalty = models.IntegerField(default=0)
     type = models.CharField(max_length=40)
     desc = models.CharField(max_length=4000)
+    quantity = models.IntegerField(default=1)
     class Meta:
         unique_together = (("char_id", "name"),)
         db_table = "armors"
     def __str__(self):
-        return self.name
+        return str(self.id)
 
 
 class Base_Stats(models.Model):

@@ -23,6 +23,19 @@ urlpatterns = [
     url(r'^post_login/', website_views.respond_login, name= 'index'),
     url(r'^post_register/', website_views.respond_register, name= 'index'),
     url(r'^home/(?P<session_id>(.*))/$', website_views.homepage, name='home'),
+    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/update_stats$', website_views.save_base_stats,
+        name='save_base_stats'),
+    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/update_character_info/$', website_views.save_character_info,
+        name='update_character_info'),
+    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/add_armor/$', website_views.add_armor_entry,
+        name='add_armor'),
+    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/add_weapon/$', website_views.add_weapon_entry,
+        name='add_weapon'),
+    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/update_armor/(?P<armor_id>\d+)/$', website_views.update_armor_entry,
+        name='update_armor'),
+    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/update_weapon/(?P<weapon_id>\d+)/$', website_views.update_weapon_entry,
+        name='update_weapon'),
     url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/$', website_views.edit_character, name='edit_character'),
-    url(r'^create_character/(?P<session_id>(.*))/$', website_views.create_character, name='create_character')
+    url(r'^create_character/(?P<session_id>(.*))/$', website_views.create_character, name='create_character'),
+
 ]

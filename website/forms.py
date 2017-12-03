@@ -27,8 +27,22 @@ class BaseStatsModelForm(ModelForm):
         model = Base_Stats
         fields = ['str', 'con', 'dex', 'int', 'wis','cha']
 
+
+class WeaponModelForm(ModelForm):
+    class Meta:
+        model = Weapon
+        fields = ['name','number_damage_dice','type_damage_dice','damage_bonus', 'critical','type','range','quantity','desc']
+
+
+class ArmorModelForm(ModelForm):
+    class Meta:
+        model = Armor
+        fields = ['name','armor_bonus','armor_check_penalty','type','desc']
+
+
 class FormData():
-    def __init__(self, formname, formurl):
+    def __init__(self, formname, formurl, addurl=None):
         self.formname = formname
         self.formurl = formurl
+        self.addurl = addurl
 

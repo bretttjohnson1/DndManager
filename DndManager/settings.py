@@ -119,3 +119,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/website/static/'
+
+SILENCED_SYSTEM_CHECKS = ["fields.W342"]

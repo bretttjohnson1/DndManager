@@ -24,6 +24,29 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
+def fail_session(request):
+        template = loader.get_template('login.html')
+        context = {"loginform": LoginForm(),
+                   "registerform": RegisterForm(),
+                   "login_err_mesg": "Error: invalid session id"}
+
+        return HttpResponse(template.render(context, request))
+
+def fail_invalid_db(request):
+    return HttpResponse("Error: database corrupted")
+
+def get_unique_character_instance(request, character_id):
+    characters = list(
+        Character.objects.raw("SELECT * FROM characters WHERE char_id = %s", [str(character_id), ]))
+
+    if len(characters) > 1:
+        return fail_invalid_db(request)
+
+    if len(characters) == 0:
+        return HttpResponse("NO stats of id " + str(character_id))
+
+    return characters[0]
+
 
 def login_user(username):
 
@@ -117,18 +140,10 @@ def respond_register(request):
 
 def homepage(request, session_id):
     if request.method == "POST":
-        return HttpResponse("Error: This link is for get requests")
-
-    def fail_session():
-        template = loader.get_template('login.html')
-        context = {"loginform": LoginForm(),
-                   "registerform": RegisterForm(),
-                   "login_err_mesg": "Error: invalid session id"}
-
-        return HttpResponse(template.render(context, request))
+        return HttpResponse("Error: Homepage link is for get requests")
 
     if session_id not in sessions:
-        return fail_session()
+        return fail_session(request)
 
     template = loader.get_template('homepage.html')
     for i in sessions:
@@ -173,42 +188,30 @@ def create_character(request, session_id):
         # Print out a httpResponse to test
         return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(created_char_id))
 
-    return HttpResponse("Failed: This link is for get requests")
+    return HttpResponse("Failed: Create Character link is for get requests")
 
 
 def edit_character(request, session_id, character_id):
     if request.method == "POST":
-        return HttpResponse("Error: This link is for get requests")
-
-    def fail_session():
-        template = loader.get_template('login.html')
-        context = {"loginform": LoginForm(),
-                   "registerform": RegisterForm(),
-                   "login_err_mesg": "Error: invalid session id"}
-
-        return HttpResponse(template.render(context, request))
-
-
+        return HttpResponse("Error: Edit Character link is for get requests")
 
     if session_id not in sessions:
-        return fail_session()
+        return fail_session(request)
 
     username = sessions[session_id]
 
-    characters = list(Character.objects.raw("SELECT * FROM characters WHERE char_id = %s", [str(character_id)]))
-    if len(characters) > 1:
-        return fail_session()
+    character_response = get_unique_character_instance(request, character_id)
+    if type(character_response) != Character:
+        return character_response
+    character = character_response
 
-    if len(characters) == 0:
-        return HttpResponse("NO character of id " + str(character_id))
-
-    character = characters[0]
 
     stats_list = list(Base_Stats.objects.raw("SELECT * FROM base_stats WHERE char_id_id = %s",[str(character_id),]))
+    weapons_list = list(Weapon.objects.raw("SELECT * FROM weapons WHERE char_id_id = %s", [str(character_id), ]))
+    armor_list = list(Armor.objects.raw("SELECT * FROM armors WHERE char_id_id = %s", [str(character_id), ]))
 
     if len(stats_list) > 1:
-        return fail_session()
-
+        return fail_invalid_db(request)
     if len(stats_list) == 0:
         return HttpResponse("NO stats of id " + str(character_id))
 
@@ -217,9 +220,176 @@ def edit_character(request, session_id, character_id):
     character_form_data = FormData("Character Info","update_character_info")
     stats_form =  BaseStatsModelForm(instance=stats)
     stats_form_data = FormData("Character Stats","update_stats")
+    weapons_list_forms = []
+    armor_list_forms = []
+    for weapon in weapons_list:
+        weapons_list_forms.append((int(weapon.id), WeaponModelForm(instance=weapon)))
+
+    for armor in armor_list:
+        armor_list_forms.append((int(armor.id), ArmorModelForm(instance=armor)))
+    weapon_form_data = FormData("Weapons","update_weapon", "add_weapon")
+    armor_form_data = FormData("Armor", "update_armor", "add_armor")
+
 
     template = loader.get_template('edit_character.html')
+
     context = {"forms": zip([character_form, stats_form], [character_form_data,stats_form_data]),
+               "multiforms": zip([weapons_list_forms,armor_list_forms],[weapon_form_data, armor_form_data]),
                "username": username}
 
     return HttpResponse(template.render(context, request))
+
+def save_character_info(request, session_id, character_id):
+    if session_id not in sessions:
+        return fail_session(request)
+
+    if request.method == "POST":
+        form = CharacterModelForm(request.POST)
+        if form.is_valid():
+            name,game_id,race,classname,level = form.cleaned_data['name'],form.cleaned_data['game_id'],\
+                                                      form.cleaned_data['race'],form.cleaned_data['classname'], \
+                                                      form.cleaned_data['level']
+            character_id = int(character_id)
+
+            character_response = get_unique_character_instance(request, character_id)
+            if type(character_response) != Character:
+                return character_response
+            character = character_response
+
+            character.name=name
+            character.game_id=game_id
+            character.race=race
+            character.classname=classname
+            character.level = level
+            character.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+
+def save_base_stats(request, session_id, character_id):
+    if session_id not in sessions:
+        return fail_session(request)
+
+    if request.method == "POST":
+        form = BaseStatsModelForm(request.POST)
+        if form.is_valid():
+            stren,dex,con,inteligence,wis,cha = form.cleaned_data['str'],form.cleaned_data['dex'],form.cleaned_data['con'], \
+                                      form.cleaned_data['int'],form.cleaned_data['wis'],form.cleaned_data['cha']
+            character_id = int(character_id)
+
+            stats_list = list(
+                Base_Stats.objects.raw("SELECT * FROM base_stats WHERE char_id_id = %s", [str(character_id)]))
+
+            if len(stats_list) > 1:
+                return fail_invalid_db(request)
+
+            if len(stats_list) == 0:
+                return HttpResponse("NO stats of id " + str(character_id))
+
+            base_stats = stats_list[0]
+            base_stats.str=stren
+            base_stats.dex=dex
+            base_stats.con=con
+            base_stats.int=inteligence
+            base_stats.wis=wis
+            base_stats.cha=cha
+            base_stats.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+def add_weapon_entry(request, session_id, character_id):
+    if session_id not in sessions:
+        return fail_session(request)
+    if request.method == "GET":
+        character_id = int(character_id)
+
+        character_response = get_unique_character_instance(request, character_id)
+        if type(character_response) != Character:
+            return character_response
+        character = character_response
+        weapon_list = list(
+            Weapon.objects.raw("SELECT * FROM weapons WHERE char_id_id = %s AND name = %s",
+                               [str(character_id), ""]))
+
+        if len(weapon_list) == 0:
+            new_weapon = Weapon(char_id=character, name="",critical="x2",type="",range="",desc="")
+            new_weapon.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+def update_weapon_entry(request, session_id, character_id, weapon_id):
+    if session_id not in sessions:
+        return fail_session(request)
+    if request.method == "POST":
+        form = WeaponModelForm(request.POST)
+        if form.is_valid():
+            character_id = int(character_id)
+            weapon_list = list(
+                Weapon.objects.raw("SELECT * FROM weapons WHERE id = %s", [weapon_id]))
+
+            if len(weapon_list) != 1:
+                return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+            weapon = weapon_list[0]
+            weapon.name = form.cleaned_data["name"]
+            weapon.number_damage_dice = form.cleaned_data["number_damage_dice"]
+            weapon.type_damage_dice = form.cleaned_data["type_damage_dice"]
+            weapon.damage_bonus = form.cleaned_data["damage_bonus"]
+            weapon.critical = form.cleaned_data["critical"]
+            weapon.type = form.cleaned_data["type"]
+            weapon.range = form.cleaned_data["range"]
+            weapon.quantity = form.cleaned_data["quantity"]
+            weapon.desc = form.cleaned_data["desc"]
+            weapon.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+
+
+def add_armor_entry(request, session_id, character_id):
+    if session_id not in sessions:
+        return fail_session(request)
+    if request.method == "GET":
+        character_id = int(character_id)
+
+        armor_list = list(
+            Armor.objects.raw("SELECT * FROM armors WHERE char_id_id = %s AND name = %s",
+                              [str(character_id), ""]))
+        if len(armor_list) > 0:
+            HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+        character_response = get_unique_character_instance(request, character_id)
+        if type(character_response) != Character:
+            return character_response
+        character = character_response
+
+        new_weapon = Armor(char_id=character, name="",type="",desc="")
+        new_weapon.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+def update_armor_entry(request, session_id, character_id,armor_id):
+    if session_id not in sessions:
+        return fail_session(request)
+    if request.method == "POST":
+        form = ArmorModelForm(request.POST)
+        if form.is_valid():
+            character_id = int(character_id)
+            armor_list = list(
+                Armor.objects.raw("SELECT * FROM armors WHERE id = %s", [armor_id]))
+
+            if len(armor_list) != 1:
+                return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+            armor = armor_list[0]
+            armor.name = form.cleaned_data["name"]
+            armor.armor_bonus = form.cleaned_data["armor_bonus"]
+            armor.armor_check_penalty = form.cleaned_data["armor_check_penalty"]
+            armor.type = form.cleaned_data["type"]
+            armor.desc = form.cleaned_data["desc"]
+
+            armor.save()
+
+    return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+

@@ -25,5 +25,28 @@
 
     {% endfor %}
 {% endif %}
+{% if multiforms %}
+    {% for multiform, formdata in multiforms %}
+        <div class="adjacent border">
+            <h2>{{ formdata.formname }}</h2>
+            {% for id, mform in multiform %}
+                <div class="border">
+                    <form action="{{formdata.formurl}}/{{id}}/" method="post">
+                        {% csrf_token %}
+                        {{ mform|linebreaksbr }}
+                     <br>
+                     <input type="submit" value="Submit">
+                    </form>
+                </div>
+            {% endfor %}
+        {% if formdata.addurl %}
+            <a href="{{formdata.addurl}}">
+                <button>Add</button>
+            </a>
+        {% endif %}
+        </div>
+
+    {% endfor %}
+{% endif %}
 </body>
 </html>
