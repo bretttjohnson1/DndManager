@@ -13,6 +13,17 @@
     <div class="adjacent" style="min-width: 20em;">
         <h3><a href="/create_character/{{ session_id }}/">Create Character</a></h3>
         <h3><a href="/create_game/{{ session_id}}/">Create Game </a></h3>
+        <h2>{{username}}'s Games:</h2>
+        {% if gameforms %}
+            {% for id, game_name in gameforms %}
+            <div class="border">
+                <h5>{{game_name}}</h5>
+                <a href="delete_game/{{id}}/">
+                    <button>Delete</button>
+                </a>
+            </div>
+            {% endfor %}
+        {% endif %}
     </div>
     <div class="adjacent" style="min-width: 20em;">
         <h3>Edit Characters:</h3>

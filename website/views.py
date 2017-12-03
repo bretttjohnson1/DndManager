@@ -143,14 +143,20 @@ def homepage(request, session_id):
 
     if session_id not in sessions:
         return fail_session(request)
+    user = User.objects.filter(account_name=sessions[session_id])
+    games_list = Game.objects.filter(ran_by=user)
+    gameformlist = []
+
+    for game in games_list:
+        gameformlist.append((game.game_id, str(game.game_name)))
+
 
     template = loader.get_template('homepage.html')
-    for i in sessions:
-        print(i, sessions[i])
     characters = Character.objects.raw("SELECT * FROM characters WHERE user_name_id = %s",[sessions[session_id]])
     context = {"characters": characters,
                "username": sessions[session_id],
-               "session_id": session_id}
+               "session_id": session_id,
+               "gameforms": gameformlist}
     return HttpResponse(template.render(context, request))
 
 def create_game(request, session_id):

@@ -60,7 +60,7 @@ urlpatterns = [
 
     url(r'^create_game/(?P<session_id>(.*))/$', website_views.create_game, name='create_game'),
 
-    url(r'^edit_game/(?P<session_id>(.*))/delete_game/', website_views.edit_game, name='edit_game'),
+    url(r'^edit_game/(?P<session_id>(.*))/delete_game/(?P<game_id>)', website_views.edit_game, name='edit_game'),
     url(r'^edit_game/(?P<session_id>(.*))/update/', website_views.edit_game, name='edit_game'),
     url(r'^edit_game/(?P<session_id>(.*))/$', website_views.edit_game, name='edit_game'),
 ]

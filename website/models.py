@@ -32,7 +32,7 @@ class Game(models.Model):
     class Meta:
         db_table = "games"
     def __str__(self):
-        return self.game_name
+        return str((self.game_name,self.ran_by))
 
 class Character(models.Model):
     char_id = models.AutoField(primary_key=True)
