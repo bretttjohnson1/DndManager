@@ -487,6 +487,7 @@ def update_skills_entry(request, session_id, character_id, skill_id):
 
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
 
+
 def delete_armor_entry(request, session_id, character_id, armor_id):
     if session_id not in sessions:
         return fail_session(request)
@@ -498,7 +499,16 @@ def delete_armor_entry(request, session_id, character_id, armor_id):
 
         for armor in armors:
             armor.delete()
+
     return HttpResponseRedirect("/edit_character/" + session_id + "/" + str(character_id))
+
+
+def delete_game_entry(request, session_id):
+    pass
+
+
+def delete_feat_entry(request, session_id):
+    pass
 
 
 def delete_weapon_entry(request, session_id, character_id, weapon_id):
