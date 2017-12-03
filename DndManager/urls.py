@@ -40,6 +40,9 @@ urlpatterns = [
     url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/update_weapon/(?P<weapon_id>\d+)/$', website_views.update_weapon_entry,
         name='update_weapon'),
 
+    url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/update_skill/(?P<skill_id>\d+)/$', website_views.update_skills_entry,
+        name='update_skills'),
+
     url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/add_feat/$', website_views.add_feats_entry,
         name='add_feat'),
     url(r'^edit_character/(?P<session_id>(.*))/(?P<character_id>\d+)/update_feat/(?P<feat_id>\d+)/$', website_views.update_feats_entry,

@@ -52,6 +52,13 @@ class SkillsModelForm(ModelForm):
         fields = ['ranks','class_mod','race_mod']
 
 
+class SkillData():
+    def __init__(self, name, skilltype, final_mod):
+        self.name = name
+        self.skilltype = skilltype
+        self.final_mod = final_mod
+
+
 class FormData():
     def __init__(self, formname, formurl, addurl=None, deleteurl=None):
         self.formname = formname
